@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IceMine Network | Hivatalos Bolt</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Betűtípusok: Rajdhani / Montserrat a képeken látható kristályos stílushoz -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,600;0,700;0,800;0,900;1,800;1,900&family=Rajdhani:wght@600;700;800&family=JetBrains+Mono:wght@700;800&display=swap" rel="stylesheet">
+  
+  <!-- FontAwesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Montserrat', 'sans-serif'],
+            display: ['Rajdhani', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* A képek hátterének mélykék, fagyos és ködös textúrája */
+    body {
+      background: radial-gradient(circle at 50% 0%, #062b5c 0%, #03142e 45%, #010814 100%);
+      background-attachment: fixed;
+    }
+
+    /* Kép szerinti kristályos és fényes kártya alap */
+    .ice-panel {
+      background: linear-gradient(180deg, rgba(8, 38, 77, 0.85) 0%, rgba(3, 16, 36, 0.95) 100%);
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      box-shadow: inset 0 0 20px rgba(14, 165, 233, 0.15), 0 8px 32px rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+    }
+
+    /* 3D Kék Gomb a 3. kép alapján */
+    .btn-ice-3d {
+      background: linear-gradient(180deg, #38bdf8 0%, #0284c7 50%, #0369a1 100%);
+      box-shadow: 0 0 20px rgba(56, 189, 248, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+      border: 1px solid #7dd3fc;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.7);
+    }
+    .btn-ice-3d:hover {
+      background: linear-gradient(180deg, #7dd3fc 0%, #0ea5e9 50%, #0284c7 100%);
+      box-shadow: 0 0 25px rgba(56, 189, 248, 0.75);
+    }
+
+    /* Oldalsó aktív menüpont a 3. kép alapján */
+    .nav-active {
+      background: linear-gradient(90deg, #0284c7 0%, #0369a1 70%, #0c4a6e 100%);
+      border: 1px solid #38bdf8;
+      box-shadow: 0 0 15px rgba(56, 189, 248, 0.5), inset 0 0 10px rgba(255, 255, 255, 0.2);
+    }
+
+    /* Menü gomb alap a 3. kép alapján */
+    .nav-btn {
+      background: rgba(8, 30, 58, 0.6);
+      border: 1px solid rgba(56, 189, 248, 0.2);
+      transition: all 0.2s ease-in-out;
+    }
+    .nav-btn:hover {
+      background: rgba(14, 46, 88, 0.85);
+      border-color: rgba(56, 189, 248, 0.6);
+      transform: translateX(3px);
+    }
+
+    /* Rang kártya keret ragyogás (1. kép) */
+    .rank-card {
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+    }
+    .rank-card:hover {
+      transform: translateY(-6px) scale(1.02);
+    }
+
+    /* Jégszöveg árnyék */
+    .text-ice-glow {
+      text-shadow: 0 0 12px rgba(56, 189, 248, 0.7), 0 0 24px rgba(2, 132, 199, 0.5);
+    }
+
+    /* Görgetősáv fagyos kékkel */
+    ::-webkit-scrollbar { width: 7px; }
+    ::-webkit-scrollbar-track { background: #010814; }
+    ::-webkit-scrollbar-thumb { background: #0284c7; border-radius: 4px; }
+  </style>
+</head>
+<body class="text-slate-100 font-sans selection:bg-cyan-400 selection:text-slate-950 min-h-screen flex flex-col justify-between">
+
+  <!-- Toast Értesítő -->
+  <div id="toast" class="fixed top-5 right-5 z-50 transform translate-x-72 opacity-0 pointer-events-none transition-all duration-300 flex items-center gap-3 py-3.5 px-5 rounded-2xl ice-panel border border-cyan-400 text-xs shadow-2xl">
+    <div class="w-8 h-8 rounded-xl bg-cyan-400/20 text-cyan-300 flex items-center justify-center text-sm">
+      <i class="fa-solid fa-cart-shopping"></i>
+    </div>
+    <div>
+      <span id="toastTitle" class="font-bold text-white block">Sikeres hozzáadás!</span>
+      <span id="toastMsg" class="text-slate-300 text-[11px]">A tétel a kosárba került.</span>
+    </div>
+  </div>
+
+  <div class="flex-1 flex flex-col lg:flex-row max-w-[1720px] w-full mx-auto">
+    
+    <!-- ================= BAL OLDALSÓ SÁV (A 3. KÉP SPECIFIKUS DIZÁJNJA: 1, 2, 3, 5, 6) ================= -->
+    <aside class="w-full lg:w-80 p-6 flex flex-col justify-between border-r border-cyan-900/40 ice-panel shrink-0">
+      <div class="space-y-6">
+        
+        <!-- Logo Fejléc a 3. kép kristályos stílusában -->
+        <div class="text-center pb-5 border-b border-cyan-500/20">
+          <div class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-cyan-500/20 border border-cyan-400/60 mb-2 shadow-[0_0_20px_rgba(56,189,248,0.5)]">
+            <i class="fa-solid fa-cube text-2xl text-cyan-300"></i>
+          </div>
+          <h1 class="font-black text-3xl tracking-widest text-white text-ice-glow uppercase font-display">ICEMINE</h1>
+          <p class="text-[10px] uppercase font-mono tracking-[0.25em] text-cyan-300 font-extrabold -mt-1">TÖBB, MINT EGY SZERVER</p>
+        </div>
+
+        <!-- 3. KÉP SZERINTI GOMBOK (Kizárólag: 1. Főoldal, 2. IceCoin, 3. Rangok, 5. Kiegészítők, 6. Kitiltáscsökkentés) -->
+        <nav class="space-y-2.5 font-bold text-xs uppercase tracking-wider font-display">
+          
+          <!-- 1. Főoldal -->
+          <button onclick="switchTab('home')" id="nav-home" class="nav-btn w-full flex items-center justify-between px-4 py-3.5 rounded-2xl text-slate-300">
+            <div class="flex items-center gap-3.5">
+              <div class="w-7 h-7 rounded-lg bg-cyan-950/80 border border-cyan-500/30 flex items-center justify-center text-cyan-400">
+                <i class="fa-solid fa-house text-xs"></i>
+              </div>
+              <span>Főoldal</span>
+            </div>
+            <i class="fa-solid fa-chevron-right text-[11px] text-cyan-400/60"></i>
+          </button>
+
+          <!-- 2. IceCoin -->
+          <button onclick="switchTab('icecoin')" id="nav-icecoin" class="nav-btn w-full flex items-center justify-between px-4 py-3.5 rounded-2xl text-slate-300">
+            <div class="flex items-center gap-3.5">
+              <div class="w-7 h-7 rounded-lg bg-cyan-950/80 border border-cyan-500/30 flex items-center justify-center text-cyan-400">
+                <i class="fa-solid fa-coins text-xs"></i>
+              </div>
+              <span>IceCoin</span>
+            </div>
+            <i class="fa-solid fa-chevron-right text-[11px] text-cyan-400/60"></i>
+          </button>
+
+          <!-- 3. Rangok -->
+          <button onclick="switchTab('ranks')" id="nav-ranks" class="nav-active w-full flex items-center justify-between px-4 py-3.5 rounded-2xl text-white">
+            <div class="flex items-center gap-3.5">
+              <div class="w-7 h-7 rounded-lg bg-white/20 border border-white/50 flex items-center justify-center text-white">
+                <i class="fa-solid fa-star text-xs"></i>
+              </div>
+              <span>Rangok</span>
+            </div>
+            <i class="fa-solid fa-chevron-right text-[11px] text-white"></i>
+          </button>
+
+          <!-- 5. Kiegészítők -->
+          <button onclick="switchTab('addons')" id="nav-addons" class="nav-btn w-full flex items-center justify-between px-4 py-3.5 rounded-2xl text-slate-300">
+            <div class="flex items-center gap-3.5">
+              <div class="w-7 h-7 rounded-lg bg-cyan-950/80 border border-cyan-500/30 flex items-center justify-center text-cyan-400">
+                <i class="fa-solid fa-file-lines text-xs"></i>
+              </div>
+              <span>Kiegészítők</span>
+            </div>
+            <i class="fa-solid fa-chevron-right text-[11px] text-cyan-400/60"></i>
+          </button>
+
+          <!-- 6. Kitiltáscsökkentés -->
+          <button onclick="switchTab('unban')" id="nav-unban" class="nav-btn w-full flex items-center justify-between px-4 py-3.5 rounded-2xl text-slate-300">
+            <div class="flex items-center gap-3.5">
+              <div class="w-7 h-7 rounded-lg bg-cyan-950/80 border border-cyan-500/30 flex items-center justify-center text-cyan-400">
+                <i class="fa-solid fa-shield-halved text-xs"></i>
+              </div>
+              <span>Kitiltáscsökkentés</span>
+            </div>
+            <i class="fa-solid fa-chevron-right text-[11px] text-cyan-400/60"></i>
+          </button>
+
+        </nav>
+      </div>
+
+      <!-- Alsó kártya a 3. kép szerint: "CSATLAKOZZ / JÁTÉK INDÍTÁSA" -->
+      <div class="mt-8 pt-6 border-t border-cyan-500/20">
+        <div class="rounded-2xl p-4 bg-gradient-to-b from-cyan-950/90 to-[#020d1c] border border-cyan-500/40 relative overflow-hidden">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-[10px] font-mono uppercase font-bold text-slate-400">SZERVER</span>
+            <div class="flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+              <span class="text-[11px] font-mono font-bold text-emerald-400">248 Online</span>
+            </div>
+          </div>
+          <button onclick="copyIp()" class="btn-ice-3d w-full py-2.5 rounded-xl font-display font-black text-xs uppercase tracking-wider text-slate-950 flex items-center justify-center gap-2 transition-all">
+            <i class="fa-solid fa-cube"></i>
+            <span>JÁTÉK INDÍTÁSA</span>
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ================= JOBB OLDALI TARTALOMTERÜLET ================= -->
+    <main class="flex-1 p-5 sm:p-10 overflow-y-auto">
+      
+      <!-- Felső Státusz Sáv -->
+      <div class="flex items-center justify-between mb-8 pb-4 border-b border-cyan-500/20">
+        <div>
+          <span class="text-[11px] font-mono text-cyan-400 uppercase tracking-widest font-extrabold flex items-center gap-2">
+            <i class="fa-solid fa-snowflake"></i> HIVATALOS ICEMINE ÁRUHÁZ
+          </span>
+          <h2 id="viewHeading" class="text-3xl sm:text-4xl font-black text-white font-display uppercase tracking-wide text-ice-glow mt-1">
+            RANG CSOMAGOK
+          </h2>
+        </div>
+
+        <!-- Lebegő Kosár Gomb -->
+        <button onclick="toggleCart()" class="btn-ice-3d px-5 py-2.5 rounded-xl text-slate-950 font-display font-black text-xs uppercase tracking-wider flex items-center gap-3 transition-transform hover:scale-105">
+          <i class="fa-solid fa-cart-shopping text-sm"></i>
+          <span>KOSÁR</span>
+          <span id="cartCountBadge" class="w-5 h-5 rounded-full bg-slate-950 text-cyan-300 font-mono font-black text-[10px] flex items-center justify-center">0</span>
+        </button>
+      </div>
+
+      <!-- ================= 1. RANGOK SZEKCIÓ (AZ 1. KÉP TELJES DIZÁJNJA ÉS 10 RANGJA) ================= -->
+      <div id="section-ranks" class="space-y-8">
+        <div class="text-center max-w-2xl mx-auto">
+          <h3 class="text-xl sm:text-2xl font-black text-cyan-300 font-display uppercase tracking-wider text-ice-glow">
+            VÁLASSZ RÁNGOT ÉS ÉLVEZD A TÖBB ELŐNYT!
+          </h3>
+          <p class="text-xs text-slate-400 mt-1 font-sans">
+            Minden rang örökös érvényességű, és azonnal aktiválódik a profilodon.
+          </p>
+        </div>
+
+        <!-- 10 RANG KÁRTYA 5 OSZLOPOS RÁCSBAN (PONTOSAN AZ 1. KÉP SZERINT) -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4" id="rankContainer">
+          <!-- JS generálja a pontos kártyákat -->
+        </div>
+
+        <!-- Alsó minőségi sáv az 1. kép szerint -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-6 border-t border-cyan-500/20 text-center font-display uppercase font-bold text-xs text-slate-300">
+          <div class="ice-panel p-3 rounded-xl border border-cyan-500/30 flex items-center justify-center gap-2">
+            <i class="fa-solid fa-bolt text-cyan-400 text-sm"></i> GYORS FELDOLGOZÁS
+          </div>
+          <div class="ice-panel p-3 rounded-xl border border-cyan-500/30 flex items-center justify-center gap-2">
+            <i class="fa-solid fa-shield-halved text-cyan-400 text-sm"></i> BIZTONSÁGOS FIZETÉS
+          </div>
+          <div class="ice-panel p-3 rounded-xl border border-cyan-500/30 flex items-center justify-center gap-2">
+            <i class="fa-solid fa-clock text-cyan-400 text-sm"></i> 24/7 TÁMOGATÁS
+          </div>
+          <div class="ice-panel p-3 rounded-xl border border-cyan-500/30 flex items-center justify-center gap-2">
+            <i class="fa-solid fa-gem text-cyan-400 text-sm"></i> PRÉMIUM ÉLMÉNY
+          </div>
+        </div>
+      </div>
+
+      <!-- ================= 2. ICECOIN SZEKCIÓ (A 2. KÉP 15 CSOMAGJA AZ ÉRMEKUPACOKKAL) ================= -->
+      <div id="section-icecoin" class="hidden space-y-8">
+        <div class="text-center max-w-2xl mx-auto">
+          <h3 class="text-xl sm:text-2xl font-black text-cyan-300 font-display uppercase tracking-wider text-ice-glow">
+            VÁLASSZ CSOMAGOT ÉS SZEREZD MEG A JÁTÉKBELI ELŐNYÖKET!
+          </h3>
+          <p class="text-xs text-slate-400 mt-1">
+            Használd az IceCoin egyenlegedet kozmetikákra, petekre, hátasokra vagy ládakulcsokra!
+          </p>
+        </div>
+
+        <!-- 15 ICECOIN CSOMAG (5x3 RÁCS A 2. KÉP ALAPJÁN) -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4" id="icecoinContainer">
+          <!-- JS generálja a csomagokat -->
+        </div>
+
+        <!-- Alsó infósáv a 2. kép szerint -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-6 border-t border-cyan-500/20 text-center font-display uppercase font-bold text-xs text-slate-300">
+          <div class="ice-panel p-3 rounded-xl border border-cyan-500/30 flex items-center justify-center gap-2">
+            <i class="fa-solid fa-bolt text-cyan-400 text-sm"></i> GYORS FELDOLGOZÁS
+          </div>
+          <div class="ice-panel p-3 rounded-xl border border-cyan-500/30 flex items-center justify-center gap-2">
+            <i class="fa-solid fa-shield-halved text-cyan-400 text-sm"></i> BIZTONSÁGOS FIZETÉS
+          </div>
+          <div class="ice-panel p-3 rounded-xl border border-cyan-500/30 flex items-center justify-center gap-2">
+            <i class="fa-solid fa-clock text-cyan-400 text-sm"></i> 24/7 TÁMOGATÁS
+          </div>
+          <div class="ice-panel p-3 rounded-xl border border-cyan-500/30 flex items-center justify-center gap-2">
+            <i class="fa-solid fa-coins text-cyan-400 text-sm"></i> KÉNYELMES VÁSÁRLÁS
+          </div>
+        </div>
+      </div>
+
+      <!-- ================= 3. FŐOLDAL SZEKCIÓ ================= -->
+      <div id="section-home" class="hidden space-y-6">
+        <div class="ice-panel rounded-3xl p-8 border border-cyan-400/40 text-center max-w-3xl mx-auto shadow-2xl">
+          <div class="w-16 h-16 rounded-2xl bg-cyan-500/20 text-cyan-300 border border-cyan-400/50 flex items-center justify-center text-3xl mx-auto mb-4 shadow-inner">
+            <i class="fa-solid fa-cubes"></i>
+          </div>
+          <h3 class="text-3xl font-black text-white font-display uppercase text-ice-glow">ÜDVÖZÖL AZ ICEMINE BOLT!</h3>
+          <p class="text-xs sm:text-sm text-slate-300 mt-3 leading-relaxed">
+            Válaszd ki a bal oldali menüből a számodra legmegfelelőbb kategóriát: válts rangot a szerver előnyökért, szerezz IceCoin érméket, vagy nézz szét a kiegészítők között!
+          </p>
+          <div class="flex justify-center gap-4 mt-6">
+            <button onclick="switchTab('ranks')" class="btn-ice-3d px-6 py-3 rounded-xl font-display font-black text-xs uppercase text-slate-950">Rang Csomagok</button>
+            <button onclick="switchTab('icecoin')" class="ice-panel px-6 py-3 rounded-xl font-display font-bold text-xs uppercase text-cyan-300 hover:text-white border border-cyan-400/40">IceCoin Bolt</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ================= 4. KIEGÉSZÍTŐK SZEKCIÓ ================= -->
+      <div id="section-addons" class="hidden space-y-6">
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
+          <div class="ice-panel rounded-2xl p-5 border border-cyan-900/60 flex flex-col justify-between">
+            <div>
+              <div class="w-12 h-12 rounded-xl bg-cyan-950 text-cyan-300 flex items-center justify-center text-2xl mb-3"><i class="fa-solid fa-box-open"></i></div>
+              <h4 class="font-bold text-white text-sm">Hátizsák Bővítés (+54 Slot)</h4>
+              <p class="text-xs text-slate-400 mt-1">Extra tárolókapacitás minden játékmódon.</p>
+            </div>
+            <div class="mt-4 pt-3 border-t border-cyan-500/20 flex items-center justify-between">
+              <span class="font-mono font-bold text-white text-sm">1.890 Ft</span>
+              <button onclick="addToCart('Hátizsák Bővítés', 1890)" class="btn-ice-3d px-3 py-1.5 rounded-lg text-slate-950 font-bold text-xs">Kosárba</button>
+            </div>
+          </div>
+
+          <div class="ice-panel rounded-2xl p-5 border border-cyan-900/60 flex flex-col justify-between">
+            <div>
+              <div class="w-12 h-12 rounded-xl bg-cyan-950 text-cyan-300 flex items-center justify-center text-2xl mb-3"><i class="fa-solid fa-bolt"></i></div>
+              <h4 class="font-bold text-white text-sm">2.0x Globális Booster (24 óra)</h4>
+              <p class="text-xs text-slate-400 mt-1">Dupla pénz és XP gyűjtés 24 órára.</p>
+            </div>
+            <div class="mt-4 pt-3 border-t border-cyan-500/20 flex items-center justify-between">
+              <span class="font-mono font-bold text-white text-sm">990 Ft</span>
+              <button onclick="addToCart('2.0x Booster', 990)" class="btn-ice-3d px-3 py-1.5 rounded-lg text-slate-950 font-bold text-xs">Kosárba</button>
+            </div>
+          </div>
+
+          <div class="ice-panel rounded-2xl p-5 border border-cyan-900/60 flex flex-col justify-between">
+            <div>
+              <div class="w-12 h-12 rounded-xl bg-cyan-950 text-cyan-300 flex items-center justify-center text-2xl mb-3"><i class="fa-solid fa-feather-pointed"></i></div>
+              <h4 class="font-bold text-white text-sm">Animált Jég Szárnyak</h4>
+              <p class="text-xs text-slate-400 mt-1">Látványos kozmetikai részecske szárnyak.</p>
+            </div>
+            <div class="mt-4 pt-3 border-t border-cyan-500/20 flex items-center justify-between">
+              <span class="font-mono font-bold text-white text-sm">1.490 Ft</span>
+              <button onclick="addToCart('Animált Jég Szárnyak', 1490)" class="btn-ice-3d px-3 py-1.5 rounded-lg text-slate-950 font-bold text-xs">Kosárba</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ================= 5. KITILTÁSCSÖKKENTÉS SZEKCIÓ ================= -->
+      <div id="section-unban" class="hidden space-y-6">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-2xl mx-auto">
+          <div class="ice-panel rounded-2xl p-6 border border-rose-500/40 text-center flex flex-col justify-between">
+            <div>
+              <div class="w-14 h-14 rounded-2xl bg-rose-500/20 text-rose-400 flex items-center justify-center text-3xl mx-auto mb-3">
+                <i class="fa-solid fa-gavel"></i>
+              </div>
+              <h4 class="font-bold text-white text-base">Kitiltás Feloldása (Unban)</h4>
+              <p class="text-xs text-slate-400 mt-2">Kitiltás azonnali törlése a szerverről.</p>
+            </div>
+            <div class="mt-6 pt-4 border-t border-rose-500/30 flex items-center justify-between">
+              <span class="font-mono font-black text-rose-400 text-lg">2.990 Ft</span>
+              <button onclick="addToCart('Unban Csomag', 2990)" class="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs transition-colors">Kosárba</button>
+            </div>
+          </div>
+
+          <div class="ice-panel rounded-2xl p-6 border border-amber-500/40 text-center flex flex-col justify-between">
+            <div>
+              <div class="w-14 h-14 rounded-2xl bg-amber-500/20 text-amber-400 flex items-center justify-center text-3xl mx-auto mb-3">
+                <i class="fa-solid fa-comment-slash"></i>
+              </div>
+              <h4 class="font-bold text-white text-base">Némítás Feloldása (Unmute)</h4>
+              <p class="text-xs text-slate-400 mt-2">Chat némítás azonnali megszüntetése.</p>
+            </div>
+            <div class="mt-6 pt-4 border-t border-amber-500/30 flex items-center justify-between">
+              <span class="font-mono font-black text-amber-400 text-lg">1.490 Ft</span>
+              <button onclick="addToCart('Unmute Csomag', 1490)" class="px-4 py-2 rounded-xl bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold text-xs transition-colors">Kosárba</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </main>
+
+  </div>
+
+  <!-- ================= KOSÁR OLDALSÓ PANEL ================= -->
+  <div id="cartModal" class="fixed inset-0 z-50 overflow-hidden pointer-events-none opacity-0 transition-opacity duration-300">
+    <div onclick="toggleCart()" class="absolute inset-0 bg-black/80 backdrop-blur-sm pointer-events-auto"></div>
+    <div class="absolute right-0 top-0 bottom-0 max-w-md w-full bg-[#031326] border-l border-cyan-400/40 p-6 flex flex-col justify-between shadow-2xl pointer-events-auto transform translate-x-full transition-transform duration-300" id="cartContent">
+      
+      <div>
+        <div class="flex items-center justify-between pb-4 border-b border-cyan-950">
+          <div class="flex items-center gap-2.5">
+            <i class="fa-solid fa-basket-shopping text-cyan-400 text-lg"></i>
+            <h3 class="font-display font-black text-lg text-white uppercase tracking-wider">KOSARAD TARTALMA</h3>
+          </div>
+          <button onclick="toggleCart()" class="w-8 h-8 rounded-lg bg-cyan-950 text-slate-300 hover:text-white flex items-center justify-center border border-cyan-500/30">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+
+        <div id="cartItems" class="my-4 space-y-3 max-h-[55vh] overflow-y-auto pr-1"></div>
+      </div>
+
+      <div class="pt-4 border-t border-cyan-950 space-y-3">
+        <div class="flex items-center justify-between text-xs font-mono">
+          <span class="text-slate-400">Tételek:</span>
+          <span id="cartTotalItems" class="text-white font-bold">0 db</span>
+        </div>
+        <div class="flex items-center justify-between text-sm">
+          <span class="font-semibold text-slate-300">Végösszeg:</span>
+          <span id="cartTotalPrice" class="text-2xl font-black font-mono text-cyan-300">0 Ft</span>
+        </div>
+        <button onclick="openCheckout()" id="btnGoToCheckout" class="btn-ice-3d w-full py-3.5 rounded-xl font-display font-black text-xs uppercase tracking-wider text-slate-950 flex items-center justify-center gap-2 shadow-lg disabled:opacity-50">
+          <span>Tovább a fizetéshez</span>
+          <i class="fa-solid fa-arrow-right"></i>
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ================= KASSZA MODAL (MINECRAFT NÉV MEGADÁSA) ================= -->
+  <div id="checkoutModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md opacity-0 pointer-events-none transition-all duration-300">
+    <div class="ice-panel rounded-3xl max-w-lg w-full p-6 sm:p-8 border border-cyan-400/60 shadow-2xl transform scale-95 transition-transform duration-300" id="checkoutCard">
+      
+      <div class="flex items-center justify-between pb-4 border-b border-cyan-900/60 mb-5">
+        <div>
+          <span class="text-[10px] font-mono text-cyan-400 uppercase tracking-widest font-bold">BIZTONSÁGOS KASSZA</span>
+          <h3 class="text-xl font-black text-white font-display uppercase tracking-wide">MINECRAFT ADATOK</h3>
+        </div>
+        <button onclick="closeCheckout()" class="w-8 h-8 rounded-lg bg-cyan-950 text-cyan-300 hover:text-white flex items-center justify-center border border-cyan-500/20">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="space-y-4 mb-6">
+        <div>
+          <label class="block text-xs font-mono font-bold text-cyan-300 uppercase mb-1.5">
+            <i class="fa-solid fa-user mr-1"></i> Minecraft Felhasználónév:
+          </label>
+          <div class="flex gap-3 items-center">
+            <input type="text" id="mcUser" oninput="previewSkin()" placeholder="Pl. Steve, Alex, Notch" class="w-full bg-[#020914] border border-cyan-500/40 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-cyan-400 font-mono">
+            <div class="w-11 h-11 rounded-xl bg-cyan-950 border border-cyan-400/50 overflow-hidden shrink-0 flex items-center justify-center">
+              <img id="avatarImg" src="https://mc-heads.net/avatar/Steve/36" alt="Skin" class="w-full h-full object-cover">
+            </div>
+          </div>
+          <span id="nameErr" class="text-[11px] text-rose-400 font-mono mt-1 hidden">Kérjük, add meg a játékbeli nevedet a jóváíráshoz!</span>
+        </div>
+
+        <div>
+          <label class="block text-xs font-mono font-bold text-slate-300 uppercase mb-2">Fizetés Módja:</label>
+          <div class="grid grid-cols-2 gap-2 text-xs font-semibold">
+            <label class="p-3 rounded-xl border border-cyan-500/40 bg-cyan-950/40 flex items-center justify-center gap-2 cursor-pointer hover:border-cyan-400 transition-colors">
+              <input type="radio" name="payType" value="Bankkártya" checked class="text-cyan-400">
+              <i class="fa-solid fa-credit-card text-cyan-400"></i>
+              <span>Bankkártya</span>
+            </label>
+            <label class="p-3 rounded-xl border border-cyan-500/40 bg-cyan-950/40 flex items-center justify-center gap-2 cursor-pointer hover:border-cyan-400 transition-colors">
+              <input type="radio" name="payType" value="Paysafecard" class="text-cyan-400">
+              <i class="fa-solid fa-ticket text-cyan-400"></i>
+              <span>Paysafecard</span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-between pt-4 border-t border-cyan-900/60">
+        <div>
+          <span class="text-[10px] uppercase font-mono text-slate-400 block">Végösszeg</span>
+          <span id="finalCheckoutPrice" class="text-2xl font-black font-mono text-cyan-300">0 Ft</span>
+        </div>
+        <button onclick="submitOrder()" class="btn-ice-3d px-6 py-3 rounded-xl font-display font-black text-xs uppercase tracking-wider text-slate-950 flex items-center gap-2 shadow-lg">
+          <i class="fa-solid fa-lock"></i>
+          <span>Fizetés Megkezdése</span>
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ================= JAVASCRIPT LOGIKA ================= -->
+  <script>
+    // 1. KÉP ADATAI (10 RANG A KÉPEN LÉVŐ SZÍNEKKEL ÉS ÉRTÉKEKKEL)
+    const ranks = [
+      { name: "FROST RECRUIT", ft: 2000, coins: "1.500", border: "border-sky-400/60", bg: "from-sky-500/25 to-[#051c38]", badge: "text-sky-300", icon: "fa-crown", perks: ["+1 egyidejű játékos slot", "Alap kit (kezdő felszerelés)", "/fly parancs (időkorlátos)", "Több napi ajándék"] },
+      { name: "BUILDER", ft: 2500, coins: "2.000", border: "border-teal-400/60", bg: "from-teal-500/25 to-[#052834]", badge: "text-teal-300", icon: "fa-hammer", perks: ["+2 egyidejű játékos slot", "/fly parancs (időkorlátos)", "+15% bányászati bónusz", "Extra kit(ek)", "Különleges warpok"] },
+      { name: "WARRIOR", ft: 3200, coins: "3.600", border: "border-blue-500/60", bg: "from-blue-600/25 to-[#072248]", badge: "text-blue-300", icon: "fa-shield", perks: ["+3 egyidejű játékos slot", "/fly parancs", "+20% bányászati bónusz", "Extra kit(ek)", "Különleges warpok"] },
+      { name: "PALADIN", ft: 4500, coins: "5.000", border: "border-purple-400/60", bg: "from-purple-600/25 to-[#1c0e3a]", badge: "text-purple-300", icon: "fa-crown", perks: ["+4 egyidejű játékos slot", "/fly parancs (hosszabb)", "+25% bányászati bónusz", "Exkluzív warpok", "VIP chat színek"] },
+      { name: "GUARDIAN", ft: 6500, coins: "7.500", border: "border-amber-400/60", bg: "from-amber-600/25 to-[#331c08]", badge: "text-amber-300", icon: "fa-sun", perks: ["+6 egyidejű játékos slot", "/fly parancs (hosszabb)", "+30% bányászati bónusz", "Különleges kit & effektek", "Saját rangszín + chatben"] },
+      { name: "CHAMPION", ft: 8900, coins: "10.000", border: "border-rose-500/60", bg: "from-rose-600/25 to-[#330c16]", badge: "text-rose-400", icon: "fa-fire", perks: ["+8 egyidejű játékos slot", "/god parancs", "+40% bányászati bónusz", "Exkluzív warpok", "Saját rangszín + szerveren"] },
+      { name: "TITAN", ft: 12900, coins: "15.000", border: "border-cyan-400/70", bg: "from-cyan-500/25 to-[#04283f]", badge: "text-cyan-300", icon: "fa-gem", perks: ["+10 egyidejű játékos slot", "/fly + /god parancs", "+50% bányászati bónusz", "Extra kit(ek)", "Különleges effektek"] },
+      { name: "OVERLORD", ft: 16900, coins: "18.500", border: "border-fuchsia-500/60", bg: "from-fuchsia-600/25 to-[#2d0937]", badge: "text-fuchsia-300", icon: "fa-skull", perks: ["+15 egyidejű játékos slot", "/fly + /god parancs", "+70% bányászati bónusz", "Exkluzív warpok & minion", "Saját rangszín + különleges kit"] },
+      { name: "MYTHIC", ft: 18900, coins: "23.500", border: "border-indigo-400/60", bg: "from-indigo-600/25 to-[#161240]", badge: "text-indigo-300", icon: "fa-wand-magic-sparkles", perks: ["+20 egyidejű játékos slot", "/fly + /god parancs", "+90% bányászati bónusz", "Egyedi particle effektek", "Saját rangszín + különleges kit"] },
+      { name: "ETERNAL", ft: 19900, coins: "28.000", border: "border-yellow-400/70", bg: "from-yellow-500/25 to-[#3b2b06]", badge: "text-yellow-300", icon: "fa-infinity", perks: ["+25 egyidejű játékos slot", "/all parancs (minden parancs)", "+120% bányászati bónusz", "Exkluzív warpok, minionok", "Szerver legendája cím"] }
+    ];
+
+    // 2. KÉP ADATAI (15 ICECOIN CSOMAG A PONTOS ÁRAKKAL ÉS BÓNUSZOKKAL)
+    const coins = [
+      { amt: "500", bonus: null, price: 499 },
+      { amt: "1.000", bonus: null, price: 899 },
+      { amt: "2.000", bonus: null, price: 1690 },
+      { amt: "3.500", bonus: null, price: 2990 },
+      { amt: "5.000", bonus: null, price: 3990 },
+      { amt: "7.500", bonus: null, price: 5990 },
+      { amt: "10.000", bonus: "+ 1.000 BÓNUSZ", price: 7990 },
+      { amt: "15.000", bonus: "+ 2.000 BÓNUSZ", price: 11990 },
+      { amt: "20.000", bonus: "+ 3.000 BÓNUSZ", price: 15990 },
+      { amt: "25.000", bonus: "+ 5.000 BÓNUSZ", price: 19990 },
+      { amt: "30.000", bonus: "+ 7.000 BÓNUSZ", price: 24990 },
+      { amt: "35.000", bonus: "+ 10.000 BÓNUSZ", price: 29990 },
+      { amt: "40.000", bonus: "+ 15.000 BÓNUSZ", price: 34990 },
+      { amt: "45.000", bonus: "+ 20.000 BÓNUSZ", price: 39990 },
+      { amt: "50.000", bonus: "+ 25.000 BÓNUSZ", price: 49990 }
+    ];
+
+    let cart = [];
+
+    // Rangok Kártyák Kirajzolása
+    function renderRanks() {
+      const container = document.getElementById('rankContainer');
+      container.innerHTML = '';
+      ranks.forEach(r => {
+        const perksHtml = r.perks.map(p => `
+          <li class="flex items-start gap-1.5 text-[11px] text-slate-300 leading-snug">
+            <i class="fa-solid fa-diamond text-[8px] text-cyan-400 mt-1 shrink-0"></i>
+            <span>${p}</span>
+          </li>
+        `).join('');
+
+        const card = document.createElement('div');
+        card.className = `rank-card ice-panel rounded-2xl p-4 border ${r.border} bg-gradient-to-b ${r.bg} flex flex-col justify-between shadow-xl`;
+        card.innerHTML = `
+          <div>
+            <div class="text-center pb-2.5 border-b border-white/10 mb-3">
+              <i class="fa-solid ${r.icon} ${r.badge} text-lg mb-1 block"></i>
+              <h4 class="font-display font-black text-base tracking-wider ${r.badge}">${r.name}</h4>
+            </div>
+            <ul class="space-y-1.5 mb-4">
+              ${perksHtml}
+            </ul>
+          </div>
+
+          <div class="pt-3 border-t border-white/10 space-y-2">
+            <div class="flex items-center justify-between text-[11px] font-mono font-bold">
+              <span class="text-white">${r.ft.toLocaleString()} Ft</span>
+              <span class="text-cyan-300 flex items-center gap-1">
+                <i class="fa-solid fa-coins text-[10px]"></i> ${r.coins}
+              </span>
+            </div>
+            <button onclick="addToCart('${r.name} Rang', ${r.ft})" class="btn-ice-3d w-full py-2 rounded-xl text-slate-950 font-display font-black text-xs uppercase tracking-wider transition-all">
+              VÁSÁRLÁS
+            </button>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    // IceCoin Kártyák Kirajzolása (2. kép)
+    function renderCoins() {
+      const container = document.getElementById('icecoinContainer');
+      container.innerHTML = '';
+      coins.forEach(c => {
+        const bonusTag = c.bonus ? `<span class="text-[9px] font-mono font-black text-cyan-300 bg-cyan-950/80 border border-cyan-400/50 px-2 py-0.5 rounded shadow">${c.bonus}</span>` : '';
+
+        const card = document.createElement('div');
+        card.className = "rank-card ice-panel rounded-2xl p-4 border border-cyan-400/40 flex flex-col justify-between text-center group hover:border-cyan-300 transition-all";
+        card.innerHTML = `
+          <div>
+            <h4 class="font-display font-black text-white text-xl font-mono">${c.amt}</h4>
+            <span class="text-[10px] text-cyan-300 font-mono tracking-widest block uppercase font-bold">ICECOIN</span>
+            
+            <div class="h-20 flex items-center justify-center my-3 text-cyan-300 text-4xl group-hover:scale-110 transition-transform">
+              <i class="fa-solid fa-coins drop-shadow-[0_0_15px_rgba(56,189,248,0.7)]"></i>
+            </div>
+            
+            <div class="h-5">${bonusTag}</div>
+          </div>
+
+          <div class="mt-4 pt-3 border-t border-cyan-500/20">
+            <span class="block text-base font-mono font-bold text-white mb-2">${c.price.toLocaleString()} Ft</span>
+            <button onclick="addToCart('${c.amt} IceCoin Csomag', ${c.price})" class="btn-ice-3d w-full py-2 rounded-xl text-slate-950 font-display font-black text-xs uppercase tracking-wider transition-all">
+              MEGVÁSÁRLÁS
+            </button>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    // Tab Váltó (A bal oldali menü pontos vezérlése)
+    function switchTab(view) {
+      const allViews = ['ranks', 'icecoin', 'home', 'addons', 'unban'];
+      allViews.forEach(v => {
+        document.getElementById(`section-${v}`).classList.add('hidden');
+        const b = document.getElementById(`nav-${v}`);
+        if (b) {
+          b.className = "nav-btn w-full flex items-center justify-between px-4 py-3.5 rounded-2xl text-slate-300";
+          const icon = b.querySelector('.fa-chevron-right');
+          if (icon) icon.className = "fa-solid fa-chevron-right text-[11px] text-cyan-400/60";
+        }
+      });
+
+      document.getElementById(`section-${view}`).classList.remove('hidden');
+      const activeBtn = document.getElementById(`nav-${view}`);
+      if (activeBtn) {
+        activeBtn.className = "nav-active w-full flex items-center justify-between px-4 py-3.5 rounded-2xl text-white";
+        const icon = activeBtn.querySelector('.fa-chevron-right');
+        if (icon) icon.className = "fa-solid fa-chevron-right text-[11px] text-white";
+      }
+
+      const h = document.getElementById('viewHeading');
+      if (view === 'ranks') h.innerText = "RANG CSOMAGOK";
+      if (view === 'icecoin') h.innerText = "ICECOIN CSOMAGOK";
+      if (view === 'home') h.innerText = "FŐOLDAL ÁTTEKINTÉS";
+      if (view === 'addons') h.innerText = "KIEGÉSZÍTŐK";
+      if (view === 'unban') h.innerText = "KITILTÁSCSÖKKENTÉS";
+    }
+
+    // Kosár Logika
+    function addToCart(name, price) {
+      const found = cart.find(i => i.name === name);
+      if (found) {
+        found.qty += 1;
+      } else {
+        cart.push({ name, price, qty: 1 });
+      }
+      updateCart();
+      showToast('KOSÁRBA HELYEZVE!', `${name} hozzáadva a kosárhoz.`);
+    }
+
+    function removeCartItem(name) {
+      cart = cart.filter(i => i.name !== name);
+      updateCart();
+    }
+
+    function updateCart() {
+      const count = cart.reduce((s, i) => s + i.qty, 0);
+      const total = cart.reduce((s, i) => s + (i.price * i.qty), 0);
+
+      document.getElementById('cartCountBadge').innerText = count;
+      document.getElementById('cartTotalItems').innerText = `${count} db`;
+      document.getElementById('cartTotalPrice').innerText = `${total.toLocaleString()} Ft`;
+      document.getElementById('finalCheckoutPrice').innerText = `${total.toLocaleString()} Ft`;
+
+      const list = document.getElementById('cartItems');
+      const checkoutBtn = document.getElementById('btnGoToCheckout');
+
+      if (cart.length === 0) {
+        checkoutBtn.disabled = true;
+        list.innerHTML = `<div class="text-center py-10 text-slate-500 text-xs font-mono">A kosarad jelenleg üres.</div>`;
+        return;
+      }
+
+      checkoutBtn.disabled = false;
+      list.innerHTML = '';
+      cart.forEach(item => {
+        const row = document.createElement('div');
+        row.className = "p-3 rounded-xl bg-cyan-950/40 border border-cyan-900/60 flex items-center justify-between text-xs";
+        row.innerHTML = `
+          <div>
+            <h5 class="font-bold text-white">${item.name}</h5>
+            <span class="text-cyan-300 font-mono text-[10px]">${item.price.toLocaleString()} Ft × ${item.qty}</span>
+          </div>
+          <button onclick="removeCartItem('${item.name}')" class="text-rose-400 hover:text-rose-300 p-1">
+            <i class="fa-solid fa-trash"></i>
+          </button>
+        `;
+        list.appendChild(row);
+      });
+    }
+
+    function toggleCart() {
+      const m = document.getElementById('cartModal');
+      const c = document.getElementById('cartContent');
+      if (m.classList.contains('opacity-0')) {
+        m.classList.remove('opacity-0', 'pointer-events-none');
+        c.classList.remove('translate-x-full');
+      } else {
+        m.classList.add('opacity-0', 'pointer-events-none');
+        c.classList.add('translate-x-full');
+      }
+    }
+
+    function openCheckout() {
+      toggleCart();
+      const modal = document.getElementById('checkoutModal');
+      const card = document.getElementById('checkoutCard');
+      modal.classList.remove('opacity-0', 'pointer-events-none');
+      card.classList.remove('scale-95');
+      card.classList.add('scale-100');
+    }
+
+    function closeCheckout() {
+      const modal = document.getElementById('checkoutModal');
+      const card = document.getElementById('checkoutCard');
+      modal.classList.add('opacity-0', 'pointer-events-none');
+      card.classList.remove('scale-100');
+      card.classList.add('scale-95');
+    }
+
+    let skinTimer;
+    function previewSkin() {
+      clearTimeout(skinTimer);
+      skinTimer = setTimeout(() => {
+        const u = document.getElementById('mcUser').value.trim();
+        const img = document.getElementById('avatarImg');
+        if (u.length > 2) {
+          img.src = `https://mc-heads.net/avatar/${encodeURIComponent(u)}/36`;
+        } else {
+          img.src = "https://mc-heads.net/avatar/Steve/36";
+        }
+      }, 350);
+    }
+
+    function submitOrder() {
+      const u = document.getElementById('mcUser').value.trim();
+      const err = document.getElementById('nameErr');
+      if (!u) {
+        err.classList.remove('hidden');
+        return;
+      }
+      err.classList.add('hidden');
+      const total = cart.reduce((s, i) => s + (i.price * i.qty), 0);
+      alert(`SIKERES MEGRENDELÉS!\n\nJátékos: ${u}\nVégösszeg: ${total.toLocaleString()} Ft\n\nA tétel 1-2 percen belül jóváírásra kerül a szerveren!`);
+      cart = [];
+      updateCart();
+      closeCheckout();
+    }
+
+    function showToast(title, msg) {
+      const t = document.getElementById('toast');
+      document.getElementById('toastTitle').innerText = title;
+      document.getElementById('toastMsg').innerText = msg;
+      t.classList.remove('opacity-0', 'translate-x-72', 'pointer-events-none');
+      t.classList.add('opacity-100', 'translate-x-0');
+      setTimeout(() => {
+        t.classList.add('opacity-0', 'translate-x-72', 'pointer-events-none');
+        t.classList.remove('opacity-100', 'translate-x-0');
+      }, 3000);
+    }
+
+    function copyIp() {
+      navigator.clipboard.writeText("play.icemine.hu");
+      showToast('IP KIMÁSOLVA', 'play.icemine.hu a vágólapon!');
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      renderRanks();
+      renderCoins();
+      updateCart();
+    });
+  </script>
+</body>
+</html>
